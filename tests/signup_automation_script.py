@@ -1,11 +1,13 @@
 import time
 import requests
 import re
+import json
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from pathlib import Path
 
 print("Opening Website.....")
 
@@ -230,7 +232,7 @@ wait.until(
 
 print("Next button clicked.....")
 
-# --------------------------Personal Experience----------------------
+# --------------------------Professional Experience----------------------
 experience_data = {
     "number_of_students_recruited_annually" : "750",
     "focus_area" : "Undergraduate, Graduate, Doctorate",
@@ -282,6 +284,8 @@ for service in services_provided:
         )
     ).click()
 
+print("select services.....")
+
 # wait for Next Button
 wait.until(
     EC.element_to_be_clickable(
@@ -290,6 +294,77 @@ wait.until(
 ).click()
 
 print("Next button clicked.....")
+
+# ------------------------------Verification and Preferences---------------------
+verification_data = {
+    "business_registration_number" : "87B125876",
+    "certification_details" : "ICEF Certified Education Agent"
+}
+
+countries = ["Australia", "Canada", "India", "France", "United Kingdom", "United States of America"]
+
+# filling in the values in verification and preferences section
+for field_name, value in verification_data.items():
+    wait.until(
+        EC.visibility_of_element_located(
+            (By.NAME, field_name)
+        )
+    ).send_keys(value)
+
+for country in countries:
+    # open Preferred Countries dropdown
+    wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH, "//button[@role='combobox']")
+        )
+    ).click()
+
+    # select countries
+    wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH, f"//span[normalize-space()='{country}']")
+        )
+    ).click()
+
+print(" select country from dropdown.....")
+
+# select Preferred Institution Types
+institution_types = ["Universities", "Colleges"]
+
+# checking in Institution Types
+for institution in institution_types:
+    wait.until(
+        EC.element_to_be_clickable(
+            (
+                By.XPATH, f"//label[text()='{institution}']/preceding-sibling::button"
+            )
+        )
+    ).click()
+
+print(" select institutions.....")
+
+# upload business documents
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+file_path = BASE_DIR / "documents" / "QA Intern Task.pdf"
+
+upload_input = wait.until(
+    EC.presence_of_element_located(
+        (By.XPATH, "//input[@type='file']")
+    )
+)
+
+upload_input.send_keys(str(file_path))
+
+# wait for Submit Button
+wait.until(
+    EC.element_to_be_clickable(
+        (By.XPATH, "//button[contains(text(), 'Submit')]")
+    )
+).click()
+
+print("Submit button clicked.....")
+
 
 input("Press Enter to close the browser.....")
 driver.quit()
