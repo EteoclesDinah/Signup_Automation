@@ -125,7 +125,7 @@ user_data = {
     "firstName": "Kim",
     "lastName": "Namjoon",
     "email": mailbox["address"],    #dynamic email
-    "phoneNumber": "9841232458",    #send_keys() expects a string
+    "phoneNumber": "9841232463",    #send_keys() expects a string
     "password": "Test@12345",
     "confirmPassword": "Test@12345"
 }
@@ -197,7 +197,7 @@ agency_data = {
 
 region = "Nepal"
 
-# filling in the values in agency details
+# filling in the values in agency details section
 for field_name, value in agency_data.items():
     wait.until(
         EC.visibility_of_element_located(
@@ -220,6 +220,67 @@ wait.until(
 ).click()
 
 print("Region selected from dropdown: Nepal")
+
+# wait for Next Button
+wait.until(
+    EC.element_to_be_clickable(
+        (By.XPATH, "//button[contains(text(), 'Next')]")
+    )
+).click()
+
+print("Next button clicked.....")
+
+# --------------------------Personal Experience----------------------
+experience_data = {
+    "number_of_students_recruited_annually" : "750",
+    "focus_area" : "Undergraduate, Graduate, Doctorate",
+    "success_metrics" : "95%"
+}
+
+# yoe = years of experience
+yoe = "7 years"
+
+print(" 7 years selected for years of experience dropdown.....")
+
+# open Years of Experience dropdown
+wait.until(
+    EC.element_to_be_clickable(
+        (By.XPATH, "//button[@role='combobox']")
+    )
+).click()
+
+# select years of experience
+wait.until(
+    EC.element_to_be_clickable(
+        (By.XPATH, f"//*[text()='{yoe}']")
+    )
+).click()
+
+# filling in the values in personal experience section
+for field_name, value in experience_data.items():
+    wait.until(
+        EC.visibility_of_element_located(
+            (By.NAME, field_name)
+        )
+    ).send_keys(value)
+
+# select service provided, checkbox
+# using list for selecting multiple services
+services_provided = [
+    "Career Counseling",
+    "Admission Applications",
+    "Test Prepration"
+]
+
+# checking in the services provided
+for service in services_provided:
+    wait.until(
+        EC.element_to_be_clickable(
+            (
+                By.XPATH, f"//label[text()='{service}']/preceding-sibling::button"
+            )
+        )
+    ).click()
 
 # wait for Next Button
 wait.until(
