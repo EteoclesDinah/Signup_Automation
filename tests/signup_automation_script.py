@@ -125,7 +125,7 @@ user_data = {
     "firstName": "Kim",
     "lastName": "Namjoon",
     "email": mailbox["address"],    #dynamic email
-    "phoneNumber": "9841232456",    #send_keys() expects a string
+    "phoneNumber": "9841232458",    #send_keys() expects a string
     "password": "Test@12345",
     "confirmPassword": "Test@12345"
 }
@@ -185,6 +185,50 @@ wait.until(
 ).click()
 
 print("Verify button clicked.....")
+
+# agency details, except Region of Operation
+agency_data = {
+    "agency_name" : "Global Data Corporation",
+    "role_in_agency" : "Data Analyst",
+    "agency_email" : "datacorp@global.com",
+    "agency_website" : "www.globaldatacorporation.com",
+    "agency_address" : "Baneshwor"
+}
+
+region = "Nepal"
+
+# filling in the values in agency details
+for field_name, value in agency_data.items():
+    wait.until(
+        EC.visibility_of_element_located(
+            (By.NAME, field_name)
+        )
+    ).send_keys(value)
+
+# open Region of Operation dropdown
+wait.until(
+    EC.element_to_be_clickable(
+        (By.XPATH, "//button[@role='combobox']")
+    )
+).click()
+
+# select region
+wait.until(
+    EC.element_to_be_clickable(
+        (By.XPATH, f"//span[text()='{region}']")
+    )
+).click()
+
+print("Region selected from dropdown: Nepal")
+
+# wait for Next Button
+wait.until(
+    EC.element_to_be_clickable(
+        (By.XPATH, "//button[contains(text(), 'Next')]")
+    )
+).click()
+
+print("Next button clicked.....")
 
 input("Press Enter to close the browser.....")
 driver.quit()
