@@ -9,9 +9,16 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from pathlib import Path
 from screenshot_manager import take_screenshot, clear_old_screenshots
+from video_recorder import start_recording, stop_recording, clear_old_recording
+
+clear_old_screenshots()
+
+clear_old_recording()
 
 # launch chrome browser and open the registrtion (sign up) site
 driver = webdriver.Chrome()
+
+start_recording(driver)
 
 driver.maximize_window()
 driver.get("https://authorized-partner.vercel.app/")
@@ -444,6 +451,6 @@ take_screenshot(driver, "profile_page")
 
 print(".....Registration Completed. Account has been created Successfully.....")
 
-input("Press Enter to close the browser.....")
+stop_recording()
 
 driver.quit()
