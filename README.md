@@ -1,4 +1,4 @@
-## Task Overview:
+# Task Overview:
 
 Automate the signup process on the following site:
 https://authorized-partner.vercel.app/

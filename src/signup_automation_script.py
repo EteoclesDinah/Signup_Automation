@@ -132,11 +132,15 @@ wait.until(
 print("Continue clicked.....")
 
 # ---------------------personal details----------------------------
+# generate unique Nepal-format mobile number
+stamp = str(int(time.time() * 1000))[-8:]
+phone_number = f"85{stamp}"[:10]
+
 user_data = {
     "firstName": "Kim",
     "lastName": "Namjoon",
     "email": mailbox["address"],    #dynamic email
-    "phoneNumber": "9841232478",    #send_keys() expects a string
+    "phoneNumber": phone_number,    #dynamic Nepal-format mobile number
     "password": "Test@12345",
     "confirmPassword": "Test@12345"
 }
