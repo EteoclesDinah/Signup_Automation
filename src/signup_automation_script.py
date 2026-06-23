@@ -415,13 +415,38 @@ wait.until(
     )
 ).click()
 
+# take screenshot of the page after filling in the details, before clicking the Next Button
+take_screenshot(driver, "verification_preferences")
+
 print("Submit button clicked.....")
+
+wait.until(
+    EC.url_contains("/admin/profile")
+)
+
+wait.until(
+    lambda current_driver: current_driver.execute_script("return document.readyState") == "complete"
+)
+
+wait.until(
+    lambda current_driver: any(
+        profile_text in current_driver.find_element(By.TAG_NAME, "body").text
+        for profile_text in [
+            user_data["firstName"],
+            user_data["lastName"],
+            agency_data["agency_name"],
+            user_data["email"],
+        ]
+    )
+)
+
+time.sleep(2)
+
+# take screenshot of the admin profile page after successful registration
+take_screenshot(driver, "profile_page")
 
 print(".....Registration Completed. Account has been created Successfully.....")
 
 input("Press Enter to close the browser.....")
-
-# take screenshot of the page after filling in the details, before clicking the Next Button
-take_screenshot(driver, "profile_page")
 
 driver.quit()
