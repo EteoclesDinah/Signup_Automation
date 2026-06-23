@@ -10,8 +10,6 @@ from selenium.webdriver.support import expected_conditions as EC
 from pathlib import Path
 from screenshot_manager import take_screenshot, clear_old_screenshots
 
-clear_old_screenshots()
-
 # launch chrome browser and open the registrtion (sign up) site
 driver = webdriver.Chrome()
 
@@ -365,13 +363,11 @@ for country in countries:
     # select countries
     option = wait.until(
         EC.element_to_be_clickable(
-            (By.XPATH, f"//span[normalize-space()='{country}']")
+            ( By.XPATH,f"//div[span[normalize-space()='{country}']]")
         )
     )
-    
-    option.click()
 
-    time.sleep(1)
+    driver.execute_script("arguments[0].click();", option)
 
 print(" select country from dropdown.....")
 
@@ -420,6 +416,7 @@ take_screenshot(driver, "verification_preferences")
 
 print("Submit button clicked.....")
 
+# wait for profile page
 wait.until(
     EC.url_contains("/admin/profile")
 )
