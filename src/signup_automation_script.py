@@ -8,6 +8,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from pathlib import Path
+from screenshot_manager import take_screenshot, clear_old_screenshots
+
+clear_old_screenshots()
 
 # launch chrome browser and open the registrtion (sign up) site
 driver = webdriver.Chrome()
@@ -104,6 +107,9 @@ mailbox = create_mailbox()
 
 print("Temporary Email: ", mailbox["address"])
 
+# take screenshot of the page after filling in the details, before clicking the Next Button
+take_screenshot(driver, "registration_page")
+
 # wait for Get Started button
 wait.until(
     EC.element_to_be_clickable(
@@ -121,6 +127,9 @@ wait.until(
 ).click()
 
 print("Checkbox clicked.....")
+
+# take screenshot of the page after filling in the details, before clicking the Next Button
+take_screenshot(driver, "register")
 
 # wait for Continue button
 wait.until(
@@ -154,6 +163,9 @@ for field_name, value in user_data.items():
     ).send_keys(value)
 
 print("Personal Details filled.....")
+
+# take screenshot of the page after filling in the details, before clicking the Next Button
+take_screenshot(driver, "personal_details")
 
 # wait for Next buttom
 wait.until(
@@ -196,6 +208,9 @@ wait.until(
 ).send_keys(otp_code)
 
 print("OTP code filled in.....")
+
+# take screenshot of the page after filling in the details, before clicking the Next Button
+take_screenshot(driver, "email_verification")
 
 # enter Verify Code
 wait.until(
@@ -240,6 +255,9 @@ wait.until(
 ).click()
 
 print(" Nepal Region selected from dropdown")
+
+# take screenshot of the page after filling in the details, before clicking the Next Button
+take_screenshot(driver, "agency_details")
 
 # wait for Next Button
 wait.until(
@@ -305,6 +323,9 @@ for service in services_provided:
 
 print("select services.....")
 
+# take screenshot of the page after filling in the details, before clicking the Next Button
+take_screenshot(driver, "professional_experience")
+
 # wait for Next Button
 wait.until(
     EC.element_to_be_clickable(
@@ -369,7 +390,7 @@ for institution in institution_types:
 
 print(" select institutions.....")
 
-# resolbe PDF path relative to project root
+# resolve PDF path relative to project root
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 file_path = BASE_DIR / "documents" / "QA Intern Task.pdf"
@@ -382,6 +403,9 @@ upload_input = wait.until(
 )
 
 upload_input.send_keys(str(file_path))
+
+# take screenshot of the page after filling in the details, before clicking the Next Button
+take_screenshot(driver, "verification_preferences")
 
 # wait for Submit Button
 # submit the completed application form
@@ -396,4 +420,8 @@ print("Submit button clicked.....")
 print(".....Registration Completed. Account has been created Successfully.....")
 
 input("Press Enter to close the browser.....")
+
+# take screenshot of the page after filling in the details, before clicking the Next Button
+take_screenshot(driver, "profile_page")
+
 driver.quit()
