@@ -33,6 +33,8 @@ pytest src/signup_automation_script.py \ --html=reports/report.html
 
 The script generates unique data for email.
 - Email: disposable 'mail.tm' account, generated at run time, right after opening the link and before further processing.
+- Phone number: generated unique Nepal-format mobile number
+
 
 ## Notes
 
