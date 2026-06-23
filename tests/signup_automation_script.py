@@ -9,25 +9,29 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from pathlib import Path
 
-print("Opening Website.....")
-
+# launch chrome browser and open the registrtion (sign up) site
 driver = webdriver.Chrome()
 
 driver.maximize_window()
 driver.get("https://authorized-partner.vercel.app/")
 
+print("Opening Website.....")
+
 wait = WebDriverWait(driver, 10)
 
+# base URL for Mail.tm temporary email service
 MAIL_TM_API = "https://api.mail.tm"
 
 print("Creating temporary email.....")
 
 # define mailbox
 def create_mailbox():
+    # fetch available email domain from Mail.tm
     domains = requests.get(f"{MAIL_TM_API}/domains").json()
 
     active_domain = None
 
+    # find the first active domain
     for domain in domains["hydra:member"]:
         if domain["isActive"]:
             active_domain = domain["domain"]
@@ -36,11 +40,13 @@ def create_mailbox():
     if not active_domain:
         raise Exception("No active domain found")
     
+    # use timestamp to generate a unique email address and password
     stamp = str(int(time.time()))
 
     address = f"qaauth{stamp}@{active_domain}"
     password = f"Mail{stamp}!aA1"
 
+    # create temporary mailbox account
     requests.post(
         f"{MAIL_TM_API}/accounts",
         json={
@@ -49,6 +55,7 @@ def create_mailbox():
         }
     )
 
+    # authenticate and obtain access token for mailbox operations
     token_response = requests.post(
         f"{MAIL_TM_API}/token",
         json={
@@ -72,6 +79,7 @@ def wait_for_email(token, timeout = 120):
 
     start_time = time.time()
 
+    # poll mailbox every 5 seconds until email arrives
     while time.time() - start_time < timeout:
         response = requests.get(
             f"{MAIL_TM_API}/messages",
@@ -81,6 +89,7 @@ def wait_for_email(token, timeout = 120):
 
         messages = response.json()
 
+        # return the latest email once available
         if messages["hydra:member"]:
             return messages["hydra:member"][0]
         
@@ -122,16 +131,17 @@ wait.until(
 
 print("Continue clicked.....")
 
-# personal details 
+# ---------------------personal details----------------------------
 user_data = {
     "firstName": "Kim",
     "lastName": "Namjoon",
     "email": mailbox["address"],    #dynamic email
-    "phoneNumber": "9841232463",    #send_keys() expects a string
+    "phoneNumber": "9841232478",    #send_keys() expects a string
     "password": "Test@12345",
     "confirmPassword": "Test@12345"
 }
 
+# populate personal details form using the dictionary values
 for field_name, value in user_data.items():
     wait.until(
         EC.visibility_of_element_located(
@@ -139,7 +149,7 @@ for field_name, value in user_data.items():
         )
     ).send_keys(value)
 
-print("personal details filled.....")
+print("Personal Details filled.....")
 
 # wait for Next buttom
 wait.until(
@@ -148,12 +158,13 @@ wait.until(
     )
 ).click()
 
-print("Next button clicked.....")
+print("Next button that leads to Agency Details section clicked.....")
 
 message = wait_for_email(mailbox["token"])
 
 print("Verification email received...")
 
+# retrieve complete email content
 email_data = requests.get(
     f"{MAIL_TM_API}/messages/{message['id']}",
     headers={
@@ -163,8 +174,11 @@ email_data = requests.get(
 
 print("Extracting OTP.....")
 
-# extract otp
+# extract first 6-digit OTP from the email body
 otp_match = re.search(r"\b\d{6}\b", email_data["text"])
+
+if not otp_match:
+    raise Exception("OTP not found in email.")
 
 otp_code = otp_match.group()
 
@@ -188,7 +202,7 @@ wait.until(
 
 print("Verify button clicked.....")
 
-# agency details, except Region of Operation
+# -----------------------agency details---------------------------
 agency_data = {
     "agency_name" : "Global Data Corporation",
     "role_in_agency" : "Data Analyst",
@@ -221,7 +235,7 @@ wait.until(
     )
 ).click()
 
-print("Region selected from dropdown: Nepal")
+print(" Nepal Region selected from dropdown")
 
 # wait for Next Button
 wait.until(
@@ -230,7 +244,7 @@ wait.until(
     )
 ).click()
 
-print("Next button clicked.....")
+print("Next button that leads to Professional Experience Section clicked.....")
 
 # --------------------------Professional Experience----------------------
 experience_data = {
@@ -293,7 +307,7 @@ wait.until(
     )
 ).click()
 
-print("Next button clicked.....")
+print("Next button that leads to Verifictaion and Preferences section clicked.....")
 
 # ------------------------------Verification and Preferences---------------------
 verification_data = {
@@ -301,7 +315,7 @@ verification_data = {
     "certification_details" : "ICEF Certified Education Agent"
 }
 
-countries = ["Australia", "Canada", "India", "France", "United Kingdom", "United States of America"]
+countries = ["Australia", "Canada", "India", "Nepal", "France", "United Kingdom", "United States of America"]
 
 # filling in the values in verification and preferences section
 for field_name, value in verification_data.items():
@@ -311,20 +325,27 @@ for field_name, value in verification_data.items():
         )
     ).send_keys(value)
 
+# multi-select preferred countries
 for country in countries:
     # open Preferred Countries dropdown
-    wait.until(
+    dropdown = wait.until(
         EC.element_to_be_clickable(
             (By.XPATH, "//button[@role='combobox']")
         )
-    ).click()
+    )
+    
+    dropdown.click()
 
     # select countries
-    wait.until(
+    option = wait.until(
         EC.element_to_be_clickable(
             (By.XPATH, f"//span[normalize-space()='{country}']")
         )
-    ).click()
+    )
+    
+    option.click()
+
+    time.sleep(1)
 
 print(" select country from dropdown.....")
 
@@ -343,11 +364,12 @@ for institution in institution_types:
 
 print(" select institutions.....")
 
-# upload business documents
+# resolbe PDF path relative to project root
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 file_path = BASE_DIR / "documents" / "QA Intern Task.pdf"
 
+# upload supporting business document
 upload_input = wait.until(
     EC.presence_of_element_located(
         (By.XPATH, "//input[@type='file']")
@@ -357,6 +379,7 @@ upload_input = wait.until(
 upload_input.send_keys(str(file_path))
 
 # wait for Submit Button
+# submit the completed application form
 wait.until(
     EC.element_to_be_clickable(
         (By.XPATH, "//button[contains(text(), 'Submit')]")
@@ -365,6 +388,7 @@ wait.until(
 
 print("Submit button clicked.....")
 
+print(".....Registration Completed. Account has been created Successfully.....")
 
 input("Press Enter to close the browser.....")
 driver.quit()
