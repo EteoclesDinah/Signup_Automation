@@ -244,6 +244,7 @@ wait.until(
     )
 ).click()
 
+
 print("Next button that leads to Professional Experience Section clicked.....")
 
 # --------------------------Professional Experience----------------------
